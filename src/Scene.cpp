@@ -108,6 +108,7 @@ void Scene::initAnimation()
 void Scene::pause()
 {
     pauseFlag = !pauseFlag;
+    std::cout << "Pause: " << (pauseFlag ? "ON" : "OFF") << std::endl;
 }
 
 void Scene::update()

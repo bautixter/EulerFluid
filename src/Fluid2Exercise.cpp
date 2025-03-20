@@ -38,10 +38,10 @@ void Fluid2::fluidAdvection(const float dt)
     for (int i = 0; i < inkRGB.getSize().x; ++i) {
         for (int j = 0; j < inkRGB.getSize().y; ++j) {
             // Obtener la posición central de la celda (i, j)
-            Vector2 Xt = grid.getCellPos(Index2(i, j));
+            Vector2 Xt = grid.getCellPos(Index2(i,j));
 
             // Obtener la velocidad en la celda (i, j)
-            Vector2 Ut = Vector2(getVelocityX()[i, j], getVelocityY()[i, j]);
+            Vector2 Ut = Vector2(getVelocityX().getValue(i,j), getVelocityY().getValue(i,j));
 
             // Calcular la posición anterior
             Vector2 Xt_prev = Xt - dt * Ut;
@@ -57,31 +57,28 @@ void Fluid2::fluidAdvection(const float dt)
             float ty = IJt_safe.y - floor(IJt_safe.y);
 
             // Obtener los índices de los cuatro puntos más cercanos
-            int i0 = static_cast<int>(floor(IJt_safe.x));
-            int j0 = static_cast<int>(floor(IJt_safe.y));
-            int i1 = i0 + 1;
-            int j1 = j0 + 1;
+            unsigned int i0 = floor(IJt_safe.x);
+            unsigned int j0 = floor(IJt_safe.y);
+            unsigned int i1 = i0 + 1;
+            unsigned int j1 = j0 + 1;
 
             // Asegurarse de que los índices estén dentro de los límites
-            i0 = std::max(0, std::min(i0, int(inkRGB0.getSize().x - 1)));
-            j0 = std::max(0, std::min(j0, int(inkRGB0.getSize().y - 1)));
-            i1 = std::max(0, std::min(i1, int(inkRGB0.getSize().x - 1)));
-            j1 = std::max(0, std::min(j1, int(inkRGB0.getSize().y - 1)));
+            i1 = std::min(i1, inkRGB0.getSize().x - 1);
+            j1 = std::min(j1, inkRGB0.getSize().y - 1);
 
             // Obtener los valores de inkRGB0 en los cuatro puntos más cercanos
-            Vector3 aa = inkRGB0[i0,j0];
-            Vector3 ba = inkRGB0[i1,j0];
-            Vector3 ab = inkRGB0[i0,j1];
-            Vector3 bb = inkRGB0[i1,j1];
+            Vector3 aa = inkRGB0.getValue(i0, j0);
+            Vector3 ba = inkRGB0.getValue(i1, j0);
+            Vector3 ab = inkRGB0.getValue(i0, j1);
+            Vector3 bb = inkRGB0.getValue(i1, j1);
 
             // Realizar la interpolación bilineal
             Vector3 interpolatedValue = bilerp(aa, ba, ab, bb, tx, ty);
 
             // Asignar el valor interpolado a inkRGB[i][j]
-            inkRGB[i, j] = interpolatedValue;
+            inkRGB.setValue(i, j, interpolatedValue);
         }
     }
-
     {
         // Velocity acvection term HERE
 
